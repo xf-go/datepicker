@@ -15,6 +15,9 @@
         let firstDayWeekDay = firstDay.getDay();
         if (firstDayWeekDay === 0) firstDayWeekDay = 7;
 
+        year = firstDay.getFullYear();
+        month = firstDay.getMonth() + 1;
+
         let lastDayOfLastMonth = new Date(year, month - 1, 0);
         let lastDateOfLastMonth = lastDayOfLastMonth.getDate();
 
@@ -27,11 +30,12 @@
             let date = i + 1 - preMonthDayCount;
             let showDate = date;
             let thisMonth = month;
-            // 上一月
             if (date <= 0) {
+                // 上一月
                 thisMonth = month -1;
                 showDate = lastDateOfLastMonth + date;
             } else if (date > lastDate) {
+                // 下一月
                 thisMonth = month + 1;
                 showDate = showDate - lastDate;
             }
@@ -46,7 +50,11 @@
             });
         }
 
-        return ret;
+        return {
+            year: year,
+            month: month,
+            days: ret
+        };
     }
 
     window.datepicker = datepicker;
