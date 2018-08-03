@@ -32,7 +32,7 @@
             let thisMonth = month;
             if (date <= 0) {
                 // 上一月
-                thisMonth = month -1;
+                thisMonth = month - 1;
                 showDate = lastDateOfLastMonth + date;
             } else if (date > lastDate) {
                 // 下一月

@@ -2,9 +2,11 @@
 
     let datepicker = window.datepicker;
 
+    let monthDate, $wrapper;
+
     datepicker.buildUi = function(year, month) {
 
-        let monthData = datepicker.getMonthData(year, month);
+        monthData = datepicker.getMonthData(year, month);
 
         let html = 
             '<div class="ui-datepicker-header">' +
@@ -31,7 +33,7 @@
                         if (i % 7 === 0) {
                             html += '<tr>'
                         }
-                        html += '<td>' + date.showDate + '</td>'
+                        html += '<td data-date="' + date.date + '">' + date.showDate + '</td>'
                         if (i % 7 === 6) {
                             html += '</tr>'
                         }
@@ -43,14 +45,30 @@
         return html;
     }
 
-    datepicker.init = function(input) {
-        let html = datepicker.buildUi()
+    datepicker.render = function(direction) {
+        console.log(monthDate)
+        let year, month
+        if (monthDate) {
+            year = monthDate.year
+            month = monthDate.month
+        }
 
-        let $wrapper = document.createElement('div')
-        $wrapper.className = 'ui-datepicker-wrapper'
+        if (direction === 'prev') month--
+        if (direction === 'prev') month++
+
+        let html = datepicker.buildUi(year, month)
+
+        $wrapper = document.querySelector('ui-datepicker-wrapper')
+        if (!$wrapper) {
+            $wrapper = document.createElement('div')
+            document.body.appendChild($wrapper)
+            $wrapper.className = 'ui-datepicker-wrapper'
+        }
         $wrapper.innerHTML = html
+    }
 
-        document.body.appendChild($wrapper)
+    datepicker.init = function(input) {
+        datepicker.render()
 
         let $input = document.querySelector(input)
         let isOpen = false
@@ -69,6 +87,48 @@
                 isOpen = true
             }
         }, false);
+
+        $wrapper.addEventListener('click', function(e) {
+            let $target = e.target
+
+            if (!$target.classList.contains('ui-datepicker-btn')) {
+                return
+            }
+
+            if ($target.classList.contains('ui-datepicker-prev-btn')) {
+                datepicker.render('prev')
+            } else if ($target.classList.contains('ui-datepicker-next-btn')) {
+                datepicker.render('next')
+            }
+        }, false)
+
+        $wrapper.addEventListener('click', function(e) {
+            let $target = e.target
+            if ($target.tagName.toLowerCase() !== 'td') return;
+            let date = new Date(monthDate.year, monthDate.month - 1, $target.dataset.date)
+
+            $input.value = format(date)
+
+            $wrapper.classList.remove('ui-datepicker-wrapper-show')
+            isOpen = false
+        })
+    }
+
+    function format(date) {
+        let ret = ''
+
+        let padding = function(num) {
+            if (num <= 9) {
+                return '0' + num
+            }
+            return num
+        }
+
+        ret += date.getFullYear() + '-';
+        ret += padding(date.getMonth() + 1) + '-';
+        ret += padding(date.getDate())
+
+        return ret
     }
 
 })();
